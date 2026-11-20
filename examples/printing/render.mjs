@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { writePrintingHandoff } from './handoff.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -18,9 +19,11 @@ const run = (tool, args) => execFileSync(tool, args, { cwd, encoding: 'utf8' }).
 const ff = (...args) => run('ffmpeg', ['-nostdin', '-hide_banner', '-v', 'error', '-xerror', ...args]);
 const probe = (...args) => JSON.parse(run('ffprobe', ['-v', 'error', '-of', 'json', ...args]));
 const srt = readFileSync(path.join(here, `${language}.srt`), 'utf8');
-copyFileSync(path.join(here, 'scenes.ass'), path.join(cwd, 'scenes.ass'));
+for (const name of ['scenes.ass', 'narration.wav', 'NOTICE.md']) {
+  copyFileSync(path.join(here, name), path.join(cwd, name));
+}
 copyFileSync(path.join(here, `${language}.srt`), path.join(cwd, 'source.srt'));
-const wav = path.join(here, 'narration.wav');
+const wav = path.join(cwd, 'narration.wav');
 const [audio] = probe('-show_streams', wav).streams;
 assert.equal(Number(audio.duration_ts), 116125 + 154781);
 assert.equal(Number(audio.sample_rate), 22050);
@@ -64,7 +67,9 @@ for (const t of [2, 8]) {
   assert.ok(brightPixels('clean', t) < 20, `Unexpected overlay in clean cut at ${t}s`);
   assert.ok(brightPixels('burned', t) > 400, `Subtitle missing at ${t}s`);
 }
+const handoff = writePrintingHandoff(cwd, language);
 console.log(`Verified ${language} captions, 15 s, 450 frames, H.264/AAC.\n${cwd}`);
 for (const variant of ['clean', 'burned']) {
   console.log(['video.mp4', 'captions.srt', 'thumbnail.jpg'].map(f => path.join(cwd, variant, f)).join('\n'));
 }
+console.log(`Editable handoff: ${handoff}`);

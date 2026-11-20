@@ -35,7 +35,8 @@ jobs:
         if: runner.os == 'Windows'
         run: choco install ffmpeg --yes --no-progress
       - run: node examples/printing/render.mjs en
-      - run: node examples/printing/render.mjs ar
+      - name: Render Arabic captions and check editable handoffs
+        run: node --test tests/handoff.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

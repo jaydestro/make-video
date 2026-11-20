@@ -1,8 +1,14 @@
 # make-video
 
-A standalone Copilot skill for creating, resuming, and revising narrated videos in ordinary chat. **The only file you distribute is `SKILL.md`.** Copilot writes the project brief, scenes, timing data, captions and render commands in a private workspace, then runs them. No renderer repository, Python scripts or template project are required.
+A portable [Agent Skill](https://agentskills.io) for creating, resuming, and revising narrated videos in ordinary chat. **The whole skill is [one Markdown file](.github/skills/make-video/SKILL.md).** Your coding agent writes the scenes, prepares narration and captions, and runs the render. You don't need to supply renderer code.
 
 **No Azure subscription, cloud speech account or API key is required.** Try the offline example below before choosing a voice for your own material.
+
+**Start in any file-capable coding agent:** Open a clone or unzipped copy of this repository as your workspace. Paste this into **agent chat**, not a terminal:
+
+> Read `.github/skills/make-video/SKILL.md` and follow it. Interview me for a new video.
+
+The first question is what to base the video on. No skill installation or slash command is needed. To use it in another project or from a skill picker, see [Install or update the skill](#install-or-update-the-skill).
 
 ## See an interview and its finished video
 
@@ -10,7 +16,7 @@ A standalone Copilot skill for creating, resuming, and revising narrated videos 
 
 [![Watch The shapes of letters: upright letterforms and English captions on a dark page](examples/printing/sample/thumbnail.jpg)](examples/printing/sample/video.mp4?raw=true)
 
-**[Watch or download the video (15 seconds, MP4)](examples/printing/sample/video.mp4?raw=true)** · [Read the interview](examples/printing/interview.md) · [Get the SRT](examples/printing/sample/captions.srt) · [View the thumbnail](examples/printing/sample/thumbnail.jpg).
+**[Watch or download the video (15 seconds, MP4)](examples/printing/sample/video.mp4?raw=true)** · [Read the interview](examples/printing/interview.md) · [Open the editable handoff](examples/printing/sample/HANDOFF.md) · [Get the SRT](examples/printing/sample/captions.srt) · [View the thumbnail](examples/printing/sample/thumbnail.jpg).
 No install or render is needed to watch. If your browser downloads the file instead of playing it, open it in your usual video player.
 
 ## Try a 15-second video without an account
@@ -21,34 +27,55 @@ Download or clone this repository, then open a terminal in its root. With [FFmpe
 node examples/printing/render.mjs
 ```
 
-The included human voice explains how handwriting influenced early printing. The example creates a **15-second clean MP4 and a captioned MP4**, plus `captions.srt` and `thumbnail.jpg` beside each. The command prints all six paths under a new `out/printing/` run. No Copilot login, network calls, packages, model downloads or credentials are used by the demo.
+The included human voice explains how handwriting influenced early printing. The example creates a **15-second clean MP4 and a captioned MP4**, plus `captions.srt` and `thumbnail.jpg` beside each, and a shared editable `HANDOFF.md`. The command prints their paths under a new `out/printing/` run. No agent login, network calls, packages, model downloads or credentials are used by the demo.
 
 Try `node examples/printing/render.mjs ar` for **English narration with Arabic captions**. Default captions are English. Both demonstration tracks use measured phrase boundaries, not word highlights. [Recording credits, transcripts and reuse terms](examples/printing/NOTICE.md). Node is only for this optional demo and smoke test, **not** a skill requirement.
 
 ## Install or update the skill
 
-**Tested chat host:** GitHub Copilot CLI on Windows. The skill is plain Markdown; other agents or hosts that read `SKILL.md` may work, but their discovery, slash commands, file access and consent prompts are not verified here. Using Copilot itself requires its normal access; the offline demo does not.
+**To add the skill to another workspace**, copy the [make-video folder](.github/skills/make-video), including `SKILL.md`, into **one** project skills directory listed below. For example, a Codex project should contain `.agents/skills/make-video/SKILL.md`. Reload the skills list or start a new chat in that workspace. To update a copied installation, replace that file with the new version. No package manager is required.
 
-Clone using the repository's **Code > HTTPS** URL, or download the ZIP. From the root of your trusted local copy, start `copilot` to use the project skill directly. To make it available in **other workspaces** without copying it, register this checkout's skills directory once:
+| Agent | Project skills directory | Start an interview in chat |
+| --- | --- | --- |
+| [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) | `.github/skills/` (already in this checkout) | `/make-video interview` |
+| [Claude Code](https://code.claude.com/docs/en/skills) | `.claude/skills/` | `/make-video interview` |
+| [OpenAI Codex](https://developers.openai.com/codex/skills/) | `.agents/skills/` | `$make-video interview` |
+| [Cursor](https://cursor.com/docs/skills) | `.agents/skills/` | Select `make-video` in the `/` menu, then type `interview`. |
+| [Gemini CLI](https://geminicli.com/docs/cli/skills/) | `.agents/skills/` | `Use the make-video skill to interview me.` |
+| [OpenCode](https://opencode.ai/docs/skills/) | `.agents/skills/` | `Use the make-video skill to interview me.` |
+| [Cline](https://docs.cline.bot/customization/skills) | `.cline/skills/` | Select `/make-video`, then type `interview`. |
+| [Windsurf / Devin Local](https://docs.windsurf.com/windsurf/cascade/skills) | `.windsurf/skills/` | `Use the make-video skill to interview me.` |
 
-| Windows (PowerShell) | macOS / Linux (terminal) |
-| --- | --- |
-| `copilot skill add (Resolve-Path '.github\skills').Path` | `copilot skill add "$PWD/.github/skills"` |
+Prefer an installer? With Node.js 22.20+ and npm, run the optional [Skills CLI](https://github.com/vercel-labs/skills) from the **destination workspace**, then select your agent(s):
 
-Use `copilot skill list` to check discovery. To update a Git checkout, run `git pull --ff-only` in it; for ZIP installs, replace the extracted files at the same path. Run `/skills reload` in an open chat. If you previously installed a **copy** of `SKILL.md`, update that copy too or use only the registered-directory method; don't keep two different `make-video` skills enabled. To install only in a single project, run `copilot skill add --project <path-to-SKILL.md>` from that project instead.
+```text
+npx skills add https://github.com/jaydestro/make-video/tree/main/.github/skills/make-video
+```
+
+Existing **Copilot CLI** users can keep a registered checkout: `copilot skill add (Resolve-Path '.github\skills').Path` (PowerShell) or `copilot skill add "$PWD/.github/skills"` (macOS/Linux). Run `copilot skill list` to check discovery and `/skills reload` after a pull. Don't enable two copies of the same skill in one host.
+
+Native discovery was checked in **Copilot CLI and Claude Code on Windows**. The other entries are based on their host documentation; the standalone render is not an end-to-end test of every client. For another agent, an older client, or a missing picker entry, use the direct-file prompt above. Rendering needs a writable workspace and permission to run commands there; a chat-only session can prepare a brief, not an MP4.
 
 ## Use it
 
-In Copilot chat, choose how to start:
+Once the skill is loaded, use ordinary language in any agent. In a checkout without native discovery, prefix any example with `Read .github/skills/make-video/SKILL.md and follow it.`
 
 | Type this | What happens |
 | --- | --- |
-| `/make-video interview` | Answer one question at a time. Start with a web URL, document, script, pasted text or just a topic. You can give a specific action or link for viewers, plus optional examples, screenshots or pronunciation notes. Copilot recommends the technical settings. |
-| `/make-video yolo https://science.nasa.gov/eclipses/` | Paste a public URL, answer one short format check, then let Copilot write, narrate, render and verify. |
-| `/make-video https://science.nasa.gov/eclipses/` | Same quick setup as YOLO. No command to memorize beyond the skill name. |
-| `/make-video` | Start the guided interview without supplying a source yet. |
+| `Use make-video. Interview me for a new video.` | Answer one question at a time, starting with a web URL, document, script, pasted text or topic. The agent recommends the technical settings. |
+| `Use make-video: yolo https://science.nasa.gov/eclipses/` | Answer one format check, then let the agent write, narrate, render and verify. A source URL alone after the skill name means the same thing. |
+| `Resume my printing video from its saved brief. Change only the closing card.` | Reuse the saved material, preserve the previous delivery, and create a new revision. |
+| `I updated the handoff.` | Read the saved edits and revise the current video. No need to paste the changes into chat. |
 
-For a revision, give the project name or previous output path and what should change. Prior deliveries stay intact.
+### Change a finished video
+
+Open the **`HANDOFF.md` linked with your video**. Under **Changes for the next cut**, write something like *“Hold the closing credit one second longer; keep the recording and captions.”* Or edit the settings, narration or scene descriptions directly. Save it, then say **“I updated the handoff.”** In a host with native skill shortcuts, `/make-video update` (or `$make-video update` in Codex) means the same thing.
+
+The agent compares your edits to the delivered cut, keeps everything else, and creates a **new version** with its own MP4, SRT, thumbnail and updated handoff. If nothing changed, it won't render again. In another agent or a fresh chat, open the delivery folder or attach the edited handoff and make the original project sources accessible. The Markdown describes the cut; it doesn't contain the audio and visual assets. [See the handoff for the 15-second example.](examples/printing/sample/HANDOFF.md)
+
+### Choosing a narrator in the interview
+
+Describe the voice you want, for example **“warm and conversational, like someone showing a friend around.”** When the agent offers samples, say **yes** to hear available voices read the same line, or **“you choose”** to skip the comparison. After listening, reply **“2”** or **“the warmer one.”** The agent saves your pick and continues without a second confirmation. If you supplied a recording and asked to use it, it keeps that narrator.
 
 ### What YOLO asks
 
@@ -60,13 +87,13 @@ For a revision, give the project name or previous output path and what should ch
 | Languages | What should viewers hear and read? Narration and captions default to the source language, not your device locale. You can request translated phrase captions, e.g. English audio with Arabic subtitles. |
 | Call to action | Optional. What should viewers do next? Give an action (e.g. "Try the query"), a destination URL, both, or "none". Your CTA appears on the closing card. |
 
-One reply is enough: **“Portrait, both, about 45 seconds, for beginners. CTA: try the query in your own container.”** After that, Copilot takes over. **Every MP4 gets its own SRT subtitle file and JPEG thumbnail**, including previews and videos with captions turned off. Choosing *both* produces two complete sets of three files using the same narration and layout.
+One reply is enough: **“Portrait, both, about 45 seconds, for beginners. CTA: try the query in your own container.”** After that, the agent takes over. **Every MP4 gets its own SRT subtitle file and JPEG thumbnail**, including previews and videos with captions turned off. Choosing *both* produces two complete sets of three files using the same narration and layout.
 
-To skip even the setup, specify shape, captions and CTA in the command (e.g. `portrait, captions off, CTA: none`), or use `/make-video yolo <URL> use defaults`. Label a separate CTA link with `CTA:` so it stays distinct from the source URL.
+To skip even the setup, specify shape, captions and CTA in the request (e.g. `portrait, captions off, CTA: none`), or say `Use make-video: yolo <URL> use defaults`. Label a separate CTA link with `CTA:` so it stays distinct from the source URL.
 
 ## What you need on the computer that renders the video
 
-You can **start an interview with just Copilot CLI and the installed skill**. To finish a narrated MP4 using the standalone FFmpeg path, the machine running Copilot needs:
+You can **start an interview with just the skill and an agent chat**. To finish a narrated MP4 with FFmpeg, the machine where the agent executes commands needs the following. For cloud or remote agents, check their workspace, not your laptop.
 
 | Needed for rendering | What to have ready |
 | --- | --- |
@@ -87,7 +114,7 @@ If either command below is missing, install an FFmpeg distribution that includes
 
 On macOS, the full formula supplies libass and is keg-only. Before running the checks or demo, run `export PATH="$(brew --prefix ffmpeg-full)/bin:$PATH"` in that terminal. Use a font with the necessary glyphs and shaping support (e.g. DejaVu Sans or a suitable Noto font for the language).
 
-Run these checks in the terminal where you run Copilot:
+Run these checks in the agent's render environment:
 
 ```text
 ffmpeg -version
