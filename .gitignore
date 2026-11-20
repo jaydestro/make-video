@@ -1,0 +1,9 @@
+.local/
+out/
+.venv/
+.voice-env/
+__pycache__/
+.env
+.env.*
+*.onnx
+*.onnx.json

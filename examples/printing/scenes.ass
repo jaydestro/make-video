@@ -1,0 +1,20 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1280
+PlayResY: 720
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Label,sans-serif,27,&H00D5DD79,&H00FFFFFF,&H0020170B,&H0020170B,0,0,0,0,100,100,2,0,1,0,0,7,70,70,60,1
+Style: Title,serif,76,&H00F3F4FC,&H00FFFFFF,&H0020170B,&H0020170B,0,0,0,0,100,100,0,0,1,0,0,7,70,70,60,1
+Style: Type,serif,118,&H00D5DD79,&H00FFFFFF,&H0020170B,&H0020170B,0,0,0,0,100,100,0,0,1,0,0,7,70,70,60,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:15.00,Label,,0,0,0,,{\pos(76,58)}TYPE STUDIES     /     01
+Dialogue: 0,0:00:00.00,0:00:05.27,Title,,0,0,0,,{\pos(72,160)}The written letter
+Dialogue: 0,0:00:00.00,0:00:05.27,Type,,0,0,0,,{\move(74,288,92,288,0,4900)\i1}Aa   Bb   Cc
+Dialogue: 0,0:00:05.27,0:00:15.00,Title,,0,0,0,,{\pos(72,160)}The printed letter
+Dialogue: 0,0:00:05.27,0:00:15.00,Type,,0,0,0,,{\pos(92,288)\fsp6}Aa   Bb   Cc
+Dialogue: 0,0:00:12.29,0:00:15.00,Label,,0,0,0,,{\pos(76,500)}Arts and Crafts Essays, 1893   /   Read by Linda Johnson

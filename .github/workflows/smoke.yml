@@ -1,0 +1,77 @@
+name: Offline narrated video
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      neural:
+        description: 'Download Piper, its dependencies and the pinned 63.5 MB voice; test real local synthesis'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  render:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Linux encoder and fonts
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Install macOS encoder with libass
+        if: runner.os == 'macOS'
+        run: |
+          brew list ffmpeg-full >/dev/null 2>&1 || brew install ffmpeg-full
+          echo "$(brew --prefix ffmpeg-full)/bin" >> "$GITHUB_PATH"
+      - name: Install Windows encoder
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg --yes --no-progress
+      - run: node examples/printing/render.mjs en
+      - run: node examples/printing/render.mjs ar
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+  neural:
+    if: github.event_name == 'workflow_dispatch' && inputs.neural
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m venv .voice-env
+      - run: .voice-env/bin/python -m pip install piper-tts==1.4.2
+      - run: .voice-env/bin/python examples/local-voice/voice.py fetch .local/voices
+      - run: .voice-env/bin/python examples/local-voice/voice.py say .local/voices examples/local-voice/garden.txt out/audition --audition
+      - run: .voice-env/bin/python examples/local-voice/voice.py say .local/voices examples/local-voice/garden.txt out/take
+      - name: Check synthesized PCM, exact transcript and measured final cue
+        shell: python
+        run: |
+          from pathlib import Path
+          import struct, wave
+          script = Path("examples/local-voice/garden.txt").read_text().splitlines()
+          for name, expected in [("audition", script[:1]), ("take", script)]:
+              folder = Path("out") / name
+              cues = (folder / "captions.srt").read_text().strip().split("\n\n")
+              assert [cue.splitlines()[2] for cue in cues] == expected
+              def seconds(stamp):
+                  h, m, s = stamp.replace(",", ".").split(":")
+                  return int(h)*3600 + int(m)*60 + float(s)
+              previous = 0
+              for cue in cues:
+                  start, end = map(seconds, cue.splitlines()[1].split(" --> "))
+                  assert start == previous and end > start
+                  previous = end
+              with wave.open(str(folder / "narration.wav")) as w:
+                  assert abs(previous - w.getnframes()/w.getframerate()) <= .001
+                  assert any(abs(sample) > 256 for (sample,) in struct.iter_unpack("<h", w.readframes(w.getnframes())))
